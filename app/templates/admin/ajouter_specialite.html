@@ -1,0 +1,87 @@
+{% extends "layout.html" %}
+
+{% block title %}Ajouter une Spécialité{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Ajouter une Spécialité</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Tableau de Bord</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.index') }}">Administration</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.specialites') }}">Spécialités</a></li>
+        <li class="breadcrumb-item active">Ajouter</li>
+    </ol>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-plus-circle me-1"></i>
+                    Formulaire d'ajout de spécialité
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('admin.ajouter_specialite') }}" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="nom" class="form-label">Nom de la spécialité</label>
+                            <input type="text" class="form-control" id="nom" name="nom" required>
+                            <div class="invalid-feedback">
+                                Veuillez entrer un nom pour la spécialité.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="4"></textarea>
+                            <div class="form-text">Description optionnelle de la spécialité.</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('admin.specialites') }}" class="btn btn-secondary me-md-2">Annuler</a>
+                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Informations
+                </div>
+                <div class="card-body">
+                    <p>Utilisez ce formulaire pour ajouter une nouvelle spécialité.</p>
+                    <p>Le nom de la spécialité doit être unique.</p>
+                    <div class="alert alert-info">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        <strong>Conseil :</strong> Choisissez un nom descriptif et facile à comprendre pour les étudiants.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Form validation
+    (function() {
+        'use strict';
+        
+        var forms = document.querySelectorAll('.needs-validation');
+        
+        Array.prototype.slice.call(forms).forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+</script>
+{% endblock %}

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenue</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #0d6efd;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #0d6efd;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        .credentials {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #0d6efd;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Bienvenue dans le système de gestion des absences</h1>
+    </div>
+    <div class="content">
+        <p>Bonjour {% if user.role == 'etudiant' %}{{ user.etudiant.prenom }} {{ user.etudiant.nom }}{% else %}{{ user.responsable.prenom }} {{ user.responsable.nom }}{% endif %},</p>
+        
+        <p>Votre compte a été créé avec succès dans le système de gestion des absences.</p>
+        
+        <div class="credentials">
+            <h4>Vos informations de connexion :</h4>
+            <p><strong>Email :</strong> {{ user.email }}</p>
+            <p><strong>Mot de passe temporaire :</strong> {{ password }}</p>
+            <p><strong>Rôle :</strong> {% if user.role == 'etudiant' %}Étudiant{% else %}Responsable{% endif %}</p>
+        </div>
+        
+        <p><strong>Important :</strong> Pour des raisons de sécurité, nous vous recommandons fortement de changer votre mot de passe lors de votre première connexion.</p>
+        
+        <p>
+            <a href="{{ url_for('auth.login', _external=True) }}" class="btn">Se connecter</a>
+        </p>
+        
+        <p>Si vous avez des questions, n'hésitez pas à contacter l'administration.</p>
+        
+        <p>Cordialement,<br>
+        L'équipe de gestion des absences</p>
+    </div>
+    <div class="footer">
+        <p>Ce message a été envoyé automatiquement, merci de ne pas y répondre.</p>
+        <p>© {{ moment().year }} Gestion des Absences</p>
+    </div>
+</body>
+</html>

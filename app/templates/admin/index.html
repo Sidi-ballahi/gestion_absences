@@ -1,0 +1,164 @@
+{% extends "layout.html" %}
+
+{% block title %}Administration{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Administration</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Tableau de Bord</a></li>
+        <li class="breadcrumb-item active">Administration</li>
+    </ol>
+    
+    <div class="row">
+        <!-- Spécialités -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-primary text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0">Spécialités</h5>
+                            <div class="small">Gérer les spécialités</div>
+                        </div>
+                        <div>
+                            <i class="fas fa-graduation-cap fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="{{ url_for('admin.specialites') }}">Gérer</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Années -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-warning text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0">Années</h5>
+                            <div class="small">Gérer les années</div>
+                        </div>
+                        <div>
+                            <i class="fas fa-calendar fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="{{ url_for('admin.annees') }}">Gérer</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modules -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-success text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0">Modules</h5>
+                            <div class="small">Gérer les modules</div>
+                        </div>
+                        <div>
+                            <i class="fas fa-book fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="{{ url_for('admin.modules') }}">Gérer</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Utilisateurs -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card bg-danger text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0">Utilisateurs</h5>
+                            <div class="small">Gérer les utilisateurs</div>
+                        </div>
+                        <div>
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" href="{{ url_for('admin.utilisateurs') }}">Gérer</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-plus me-1"></i>
+                    Actions rapides
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="{{ url_for('admin.ajouter_specialite') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-plus-circle me-2"></i>
+                            Ajouter une spécialité
+                        </a>
+                        <a href="{{ url_for('admin.ajouter_utilisateur') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-user-plus me-2"></i>
+                            Ajouter un utilisateur
+                        </a>
+                        <a href="{{ url_for('absence.ajouter') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-calendar-plus me-2"></i>
+                            Ajouter une absence
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-bar me-1"></i>
+                    Statistiques rapides
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="text-center">
+                                <h4 class="text-primary">{{ total_specialites }}</h4>
+                                <small class="text-muted">Spécialités</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center">
+                                <h4 class="text-warning">{{ total_modules }}</h4>
+                                <small class="text-muted">Modules</small>
+                            </div>
+                        </div>
+                        <div class="col-6 mt-3">
+                            <div class="text-center">
+                                <h4 class="text-success">{{ total_etudiants }}</h4>
+                                <small class="text-muted">Étudiants</small>
+                            </div>
+                        </div>
+                        <div class="col-6 mt-3">
+                            <div class="text-center">
+                                <h4 class="text-danger">{{ total_responsables }}</h4>
+                                <small class="text-muted">Responsables</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

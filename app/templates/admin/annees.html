@@ -1,0 +1,145 @@
+{% extends "layout.html" %}
+
+{% block title %}Gestion des Années{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Gestion des Années</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Tableau de Bord</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.index') }}">Administration</a></li>
+        <li class="breadcrumb-item active">Années</li>
+    </ol>
+    
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fas fa-calendar me-1"></i>
+                Liste des années
+            </div>
+            <div>
+                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addAnneeModal">
+                    <i class="fas fa-plus me-1"></i> Ajouter une année
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="anneesTable" class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Nombre d'étudiants</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for annee in annees %}
+                        <tr>
+                            <td>{{ annee.nom }}</td>
+                            <td>{{ annee.etudiants.count() }}</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editAnneeModal{{ annee.id }}" title="Modifier">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAnneeModal{{ annee.id }}" title="Supprimer" {% if annee.etudiants.count() > 0 %}disabled{% endif %}>
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                
+                                <!-- Edit Modal -->
+                                <div class="modal fade" id="editAnneeModal{{ annee.id }}" tabindex="-1" aria-labelledby="editAnneeModalLabel{{ annee.id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="editAnneeModalLabel{{ annee.id }}">Modifier l'année</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <form method="POST" action="{{ url_for('admin.modifier_annee', annee_id=annee.id) }}">
+                                                <div class="modal-body">
+                                                    <div class="mb-3">
+                                                        <label for="nom{{ annee.id }}" class="form-label">Nom de l'année</label>
+                                                        <input type="text" class="form-control" id="nom{{ annee.id }}" name="nom" value="{{ annee.nom }}" required>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                                    <button type="submit" class="btn btn-primary">Modifier</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Delete Modal -->
+                                <div class="modal fade" id="deleteAnneeModal{{ annee.id }}" tabindex="-1" aria-labelledby="deleteAnneeModalLabel{{ annee.id }}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deleteAnneeModalLabel{{ annee.id }}">Confirmer la suppression</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Êtes-vous sûr de vouloir supprimer l'année <strong>{{ annee.nom }}</strong> ?</p>
+                                                <p class="text-danger">Cette action est irréversible.</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                                <form method="POST" action="{{ url_for('admin.supprimer_annee', annee_id=annee.id) }}" class="d-inline">
+                                                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Annee Modal -->
+<div class="modal fade" id="addAnneeModal" tabindex="-1" aria-labelledby="addAnneeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAnneeModalLabel">Ajouter une année</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('admin.ajouter_annee') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nom" class="form-label">Nom de l'année</label>
+                        <input type="text" class="form-control" id="nom" name="nom" placeholder="Ex: 2023-2024" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#anneesTable').DataTable({
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.11.5/i18n/fr-FR.json'
+            },
+            "order": [[0, 'desc']]
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends "layout.html" %}
+
+{% block title %}Modifier une Spécialité{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Modifier une Spécialité</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Tableau de Bord</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.index') }}">Administration</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.specialites') }}">Spécialités</a></li>
+        <li class="breadcrumb-item active">Modifier</li>
+    </ol>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-edit me-1"></i>
+                    Formulaire de modification de spécialité
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('admin.modifier_specialite', specialite_id=specialite.id) }}" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="nom" class="form-label">Nom de la spécialité</label>
+                            <input type="text" class="form-control" id="nom" name="nom" value="{{ specialite.nom }}" required>
+                            <div class="invalid-feedback">
+                                Veuillez entrer un nom pour la spécialité.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="4">{{ specialite.description or '' }}</textarea>
+                            <div class="form-text">Description optionnelle de la spécialité.</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('admin.specialites') }}" class="btn btn-secondary me-md-2">Annuler</a>
+                            <button type="submit" class="btn btn-primary">Mettre à jour</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Informations
+                </div>
+                <div class="card-body">
+                    <p>Modifiez les informations de la spécialité <strong>{{ specialite.nom }}</strong>.</p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <strong>Étudiants :</strong> {{ specialite.etudiants.count() }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Modules :</strong> {{ specialite.modules.count() }}
+                        </li>
+                    </ul>
+                    
+                    {% if specialite.etudiants.count() > 0 or specialite.modules.count() > 0 %}
+                    <div class="alert alert-warning mt-3">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Attention :</strong> Cette spécialité est utilisée par des étudiants ou des modules.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Form validation
+    (function() {
+        'use strict';
+        
+        var forms = document.querySelectorAll('.needs-validation');
+        
+        Array.prototype.slice.call(forms).forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+</script>
+{% endblock %}

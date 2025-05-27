@@ -1,0 +1,24 @@
+Bienvenue dans le système de gestion des absences
+
+Bonjour {% if user.role == 'etudiant' %}{{ user.etudiant.prenom }} {{ user.etudiant.nom }}{% else %}{{ user.responsable.prenom }} {{ user.responsable.nom }}{% endif %},
+
+Votre compte a été créé avec succès dans le système de gestion des absences.
+
+Vos informations de connexion :
+Email : {{ user.email }}
+Mot de passe temporaire : {{ password }}
+Rôle : {% if user.role == 'etudiant' %}Étudiant{% else %}Responsable{% endif %}
+
+IMPORTANT : Pour des raisons de sécurité, nous vous recommandons fortement de changer votre mot de passe lors de votre première connexion.
+
+Vous pouvez vous connecter à l'adresse suivante :
+{{ url_for('auth.login', _external=True) }}
+
+Si vous avez des questions, n'hésitez pas à contacter l'administration.
+
+Cordialement,
+L'équipe de gestion des absences
+
+---
+Ce message a été envoyé automatiquement, merci de ne pas y répondre.
+© {{ moment().year }} Gestion des Absences

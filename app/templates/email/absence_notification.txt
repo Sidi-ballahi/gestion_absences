@@ -1,0 +1,21 @@
+Nouvelle absence enregistrée
+
+Bonjour {{ user.etudiant.prenom }} {{ user.etudiant.nom }},
+
+Une nouvelle absence a été enregistrée pour vous :
+
+Module : {{ module.nom }}
+Date : {{ absence.date.strftime('%d/%m/%Y') }}
+Horaire : {{ absence.heure_debut.strftime('%H:%M') }} - {{ absence.heure_fin.strftime('%H:%M') }}
+
+Si cette absence est justifiée, veuillez soumettre un justificatif dès que possible via votre espace étudiant à l'adresse suivante :
+{{ url_for('etudiant.justifier_absence', absence_id=absence.id, _external=True) }}
+
+Pour rappel, les absences non justifiées peuvent avoir un impact sur votre évaluation.
+
+Cordialement,
+L'équipe pédagogique
+
+---
+Ce message a été envoyé automatiquement, merci de ne pas y répondre.
+© {{ absence.date.year }} Gestion des Absences

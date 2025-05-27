@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Application de gestion des absences" />
+    <meta name="author" content="" />
+    <title>{% block title %}{% endblock %} - Gestion des Absences</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet" />
+</head>
+<body class="sb-nav-fixed">
+    <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+        <!-- Navbar Brand-->
+        <a class="navbar-brand ps-3" href="{{ url_for('dashboard.index') }}">Gestion des Absences</a>
+        <!-- Sidebar Toggle-->
+        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
+        <!-- Navbar Search-->
+        <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
+            <div class="input-group">
+                <input class="form-control" type="text" placeholder="Rechercher..." aria-label="Rechercher..." aria-describedby="btnNavbarSearch" />
+                <button class="btn btn-primary" id="btnNavbarSearch" type="button"><i class="fas fa-search"></i></button>
+            </div>
+        </form>
+        <!-- Navbar-->
+        <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="notificationDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="position-relative">
+                        <i class="fas fa-bell fa-fw"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notificationCount" style="display: none;">
+                            0
+                            <span class="visually-hidden">notifications non lues</span>
+                        </span>
+                    </span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown" id="notificationList">
+                    <li><h6 class="dropdown-header">Notifications</h6></li>
+                    <li><div class="dropdown-item text-center">Aucune notification</div></li>
+                    <li><hr class="dropdown-divider" /></li>
+                    <li><a class="dropdown-item text-center" href="#" id="markAllRead">Marquer tout comme lu</a></li>
+                </ul>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                    <li><a class="dropdown-item" href="{{ url_for('auth.profile') }}">Mon profil</a></li>
+                    <li><hr class="dropdown-divider" /></li>
+                    <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Déconnexion</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+    <div id="layoutSidenav">
+        <div id="layoutSidenav_nav">
+            <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+                <div class="sb-sidenav-menu">
+                    <div class="nav">
+                        <div class="sb-sidenav-menu-heading">Principal</div>
+                        {% if current_user.role == 'responsable' %}
+                        <a class="nav-link" href="{{ url_for('dashboard.index') }}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                            Tableau de bord
+                        </a>
+                        {% else %}
+                        <a class="nav-link" href="{{ url_for('etudiant.dashboard') }}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                            Mon tableau de bord
+                        </a>
+                        {% endif %}
+                        
+                        <div class="sb-sidenav-menu-heading">Absences</div>
+                        {% if current_user.role == 'responsable' %}
+                        <a class="nav-link" href="{{ url_for('absence.index') }}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-calendar-times"></i></div>
+                            Gestion des absences
+                        </a>
+                        <a class="nav-link" href="{{ url_for('absence.ajouter') }}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-plus-circle"></i></div>
+                            Ajouter une absence
+                        </a>
+                        {% else %}
+                        <a class="nav-link" href="{{ url_for('etudiant.absences') }}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-calendar-times"></i></div>
+                            Mes absences
+                        </a>
+                        {% endif %}
+                        
+                        {% if current_user.role == 'responsable' %}
+                        <div class="sb-sidenav-menu-heading">Administration</div>
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseAdmin" aria-expanded="false" aria-controls="collapseAdmin">
+                            <div class="sb-nav-link-icon"><i class="fas fa-cogs"></i></div>
+                            Administration
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse" id="collapseAdmin" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                <a class="nav-link" href="{{ url_for('admin.specialites') }}">Spécialités</a>
+                                <a class="nav-link" href="{{ url_for('admin.annees') }}">Années</a>
+                                <a class="nav-link" href="{{ url_for('admin.modules') }}">Modules</a>
+                                <a class="nav-link" href="{{ url_for('admin.utilisateurs') }}">Utilisateurs</a>
+                            </nav>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="sb-sidenav-footer">
+                    <div class="small">Connecté en tant que:</div>
+                    {% if current_user.role == 'responsable' %}
+                    {{ current_user.responsable.prenom }} {{ current_user.responsable.nom }}
+                    {% else %}
+                    {{ current_user.etudiant.prenom }} {{ current_user.etudiant.nom }}
+                    {% endif %}
+                </div>
+            </nav>
+        </div>
+        <div id="layoutSidenav_content">
+            <main>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="container-fluid px-4 mt-4">
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+                
+                {% block content %}{% endblock %}
+            </main>
+            <footer class="py-4 bg-light mt-auto">
+                <div class="container-fluid px-4">
+                    <div class="d-flex align-items-center justify-content-between small">
+                        <div class="text-muted">Copyright &copy; Gestion des Absences 2023</div>
+                        <div>
+                            <a href="#">Politique de confidentialité</a>
+                            &middot;
+                            <a href="#">Conditions d'utilisation</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+    
+    <!-- Notification System -->
+    <script>
+        // Load notifications on page load
+        $(document).ready(function() {
+            loadNotifications();
+            
+            // Refresh notifications every 30 seconds
+            setInterval(loadNotifications, 30000);
+            
+            // Mark all as read
+            $('#markAllRead').on('click', function(e) {
+                e.preventDefault();
+                markAllNotificationsAsRead();
+            });
+        });
+        
+        function loadNotifications() {
+            $.ajax({
+                url: '{{ url_for("admin.get_notifications") }}',
+                type: 'GET',
+                success: function(response) {
+                    updateNotificationUI(response);
+                },
+                error: function() {
+                    console.error('Failed to load notifications');
+                }
+            });
+        }
+        
+        function updateNotificationUI(response) {
+            const count = response.count;
+            const notifications = response.notifications;
+            
+            // Update badge
+            const badge = $('#notificationCount');
+            if (count > 0) {
+                badge.text(count).show();
+            } else {
+                badge.hide();
+            }
+            
+            // Update dropdown
+            const list = $('#notificationList');
+            list.empty();
+            
+            list.append('<li><h6 class="dropdown-header">Notifications</h6></li>');
+            
+            if (notifications.length === 0) {
+                list.append('<li><div class="dropdown-item text-center text-muted">Aucune notification</div></li>');
+            } else {
+                notifications.forEach(function(notif) {
+                    const icon = getNotificationIcon(notif.type);
+                    const item = `
+                        <li>
+                            <a class="dropdown-item notification-item" href="#" data-id="${notif.id}">
+                                <div class="d-flex align-items-start">
+                                    <div class="me-2">
+                                        <i class="${icon}"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="small">${notif.message}</div>
+                                        <div class="text-muted small">${notif.created_at}</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                    `;
+                    list.append(item);
+                });
+            }
+            
+            list.append('<li><hr class="dropdown-divider" /></li>');
+            list.append('<li><a class="dropdown-item text-center" href="#" id="markAllRead">Marquer tout comme lu</a></li>');
+            
+            // Bind click events for individual notifications
+            $('.notification-item').on('click', function(e) {
+                e.preventDefault();
+                const notificationId = $(this).data('id');
+                markNotificationAsRead(notificationId);
+            });
+            
+            // Rebind mark all as read
+            $('#markAllRead').on('click', function(e) {
+                e.preventDefault();
+                markAllNotificationsAsRead();
+            });
+        }
+        
+        function getNotificationIcon(type) {
+            switch(type) {
+                case 'nouvelle_absence':
+                    return 'fas fa-calendar-times text-warning';
+                case 'justificatif_valide':
+                    return 'fas fa-check-circle text-success';
+                case 'justificatif_refuse':
+                    return 'fas fa-times-circle text-danger';
+                case 'rappel':
+                    return 'fas fa-exclamation-triangle text-warning';
+                case 'nouveau_justificatif':
+                    return 'fas fa-file-upload text-info';
+                default:
+                    return 'fas fa-bell text-primary';
+            }
+        }
+        
+        function markNotificationAsRead(notificationId) {
+            $.ajax({
+                url: `{{ url_for("admin.mark_notification_read", notification_id=0) }}`.replace('0', notificationId),
+                type: 'POST',
+                success: function() {
+                    loadNotifications();
+                },
+                error: function() {
+                    console.error('Failed to mark notification as read');
+                }
+            });
+        }
+        
+        function markAllNotificationsAsRead() {
+            $.ajax({
+                url: '{{ url_for("admin.mark_all_notifications_read") }}',
+                type: 'POST',
+                success: function() {
+                    loadNotifications();
+                },
+                error: function() {
+                    console.error('Failed to mark all notifications as read');
+                }
+            });
+        }
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

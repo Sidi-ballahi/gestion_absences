@@ -1,0 +1,141 @@
+{% extends "layout.html" %}
+
+{% block title %}Voir Justificatif{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Voir Justificatif</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Tableau de Bord</a></li>
+        {% if current_user.role == 'responsable' %}
+        <li class="breadcrumb-item"><a href="{{ url_for('absence.index') }}">Gestion des Absences</a></li>
+        {% else %}
+        <li class="breadcrumb-item"><a href="{{ url_for('etudiant.absences') }}">Mes Absences</a></li>
+        {% endif %}
+        <li class="breadcrumb-item active">Voir Justificatif</li>
+    </ol>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-file-alt me-1"></i>
+                    Justificatif
+                </div>
+                <div class="card-body">
+                    {% if file_type == 'image' %}
+                    <div class="text-center">
+                        <img src="{{ url_for('static', filename='uploads/' + absence.justificatif_path) }}" class="img-fluid" alt="Justificatif">
+                    </div>
+                    {% elif file_type == 'pdf' %}
+                    <div class="ratio ratio-16x9">
+                        <iframe src="{{ url_for('static', filename='uploads/' + absence.justificatif_path) }}" allowfullscreen></iframe>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Le type de fichier ne peut pas être affiché directement. 
+                        <a href="{{ url_for('static', filename='uploads/' + absence.justificatif_path) }}" class="alert-link" download>Télécharger le fichier</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Informations sur l'absence
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <strong>Étudiant :</strong> {{ absence.etudiant.prenom }} {{ absence.etudiant.nom }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Module :</strong> {{ absence.module.nom }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Date :</strong> {{ absence.date.strftime('%d/%m/%Y') }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Horaire :</strong> {{ absence.heure_debut.strftime('%H:%M') }} - {{ absence.heure_fin.strftime('%H:%M') }}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Statut :</strong>
+                            {% if absence.statut == 'non_justifiee' %}
+                            <span class="badge bg-danger">Non justifiée</span>
+                            {% elif absence.statut == 'en_attente' %}
+                            <span class="badge bg-warning">En attente</span>
+                            {% elif absence.statut == 'justifiee' %}
+                            <span class="badge bg-success">Justifiée</span>
+                            {% elif absence.statut == 'refusee' %}
+                            <span class="badge bg-secondary">Refusée</span>
+                            {% endif %}
+                        </li>
+                        {% if absence.commentaire %}
+                        <li class="list-group-item">
+                            <strong>Commentaire :</strong>
+                            <p class="mt-2">{{ absence.commentaire }}</p>
+                        </li>
+                        {% endif %}
+                    </ul>
+                    
+                    {% if current_user.role == 'responsable' and absence.statut == 'en_attente' %}
+                    <div class="d-grid gap-2 mt-3">
+                        <form method="POST" action="{{ url_for('absence.valider', absence_id=absence.id) }}">
+                            <button type="submit" class="btn btn-success w-100 mb-2">
+                                <i class="fas fa-check me-1"></i> Valider le justificatif
+                            </button>
+                        </form>
+                        <button type="button" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#refuserModal">
+                            <i class="fas fa-times me-1"></i> Refuser le justificatif
+                        </button>
+                    </div>
+                    
+                    <!-- Refuser Modal -->
+                    <div class="modal fade" id="refuserModal" tabindex="-1" aria-labelledby="refuserModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="refuserModalLabel">Refuser le justificatif</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form method="POST" action="{{ url_for('absence.refuser', absence_id=absence.id) }}">
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label for="raison" class="form-label">Raison du refus</label>
+                                            <textarea class="form-control" id="raison" name="raison" rows="3" required></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                        <button type="submit" class="btn btn-danger">Refuser</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-grid gap-2 mt-3">
+                        <a href="{{ url_for('static', filename='uploads/' + absence.justificatif_path) }}" class="btn btn-primary" download>
+                            <i class="fas fa-download me-1"></i> Télécharger le justificatif
+                        </a>
+                        {% if current_user.role == 'responsable' %}
+                        <a href="{{ url_for('absence.index') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i> Retour à la liste
+                        </a>
+                        {% else %}
+                        <a href="{{ url_for('etudiant.absences') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i> Retour à mes absences
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

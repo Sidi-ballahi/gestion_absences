@@ -1,0 +1,21 @@
+Justificatif accepté
+
+Bonjour {{ user.etudiant.prenom }} {{ user.etudiant.nom }},
+
+Nous vous informons que votre justificatif d'absence a été ACCEPTÉ.
+
+Module : {{ module.nom }}
+Date : {{ absence.date.strftime('%d/%m/%Y') }}
+Horaire : {{ absence.heure_debut.strftime('%H:%M') }} - {{ absence.heure_fin.strftime('%H:%M') }}
+
+Cette absence est désormais considérée comme justifiée dans votre dossier.
+
+Vous pouvez consulter l'ensemble de vos absences à l'adresse suivante :
+{{ url_for('etudiant.absences', _external=True) }}
+
+Cordialement,
+L'équipe pédagogique
+
+---
+Ce message a été envoyé automatiquement, merci de ne pas y répondre.
+© {{ absence.date.year }} Gestion des Absences

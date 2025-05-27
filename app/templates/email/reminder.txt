@@ -1,0 +1,27 @@
+Rappel : Absences non justifiées
+
+Bonjour {{ user.etudiant.prenom }} {{ user.etudiant.nom }},
+
+Ce message est un rappel concernant vos absences non justifiées.
+
+Vous avez actuellement {{ absences|length }} absence(s) non justifiée(s) :
+
+{% for absence in absences %}
+- Module : {{ absence.module.nom }}
+  Date : {{ absence.date.strftime('%d/%m/%Y') }}
+  Horaire : {{ absence.heure_debut.strftime('%H:%M') }} - {{ absence.heure_fin.strftime('%H:%M') }}
+  Justifier : {{ url_for('etudiant.justifier_absence', absence_id=absence.id, _external=True) }}
+
+{% endfor %}
+
+Pour rappel, les absences non justifiées peuvent avoir un impact sur votre évaluation.
+
+Vous pouvez consulter l'ensemble de vos absences à l'adresse suivante :
+{{ url_for('etudiant.absences', _external=True) }}
+
+Cordialement,
+L'équipe pédagogique
+
+---
+Ce message a été envoyé automatiquement, merci de ne pas y répondre.
+© {{ now.year }} Gestion des Absences

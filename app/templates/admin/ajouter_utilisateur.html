@@ -1,0 +1,194 @@
+{% extends "layout.html" %}
+
+{% block title %}Ajouter un Utilisateur{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Ajouter un Utilisateur</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Tableau de Bord</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.index') }}">Administration</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.utilisateurs') }}">Utilisateurs</a></li>
+        <li class="breadcrumb-item active">Ajouter</li>
+    </ol>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-user-plus me-1"></i>
+                    Formulaire d'ajout d'utilisateur
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('admin.ajouter_utilisateur') }}" class="needs-validation" novalidate>
+                        <!-- Informations de base -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nom" class="form-label">Nom</label>
+                                <input type="text" class="form-control" id="nom" name="nom" required>
+                                <div class="invalid-feedback">
+                                    Veuillez entrer un nom.
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="prenom" class="form-label">Prénom</label>
+                                <input type="text" class="form-control" id="prenom" name="prenom" required>
+                                <div class="invalid-feedback">
+                                    Veuillez entrer un prénom.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                                <div class="invalid-feedback">
+                                    Veuillez entrer une adresse email valide.
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label">Mot de passe</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                                <div class="invalid-feedback">
+                                    Veuillez entrer un mot de passe.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Rôle</label>
+                            <select class="form-select" id="role" name="role" required>
+                                <option value="">Sélectionner un rôle</option>
+                                <option value="etudiant" {% if request.args.get('role') == 'etudiant' %}selected{% endif %}>Étudiant</option>
+                                <option value="responsable" {% if request.args.get('role') == 'responsable' %}selected{% endif %}>Responsable</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Veuillez sélectionner un rôle.
+                            </div>
+                        </div>
+                        
+                        <!-- Champs spécifiques aux étudiants -->
+                        <div id="etudiant-fields" style="display: none;">
+                            <hr>
+                            <h5>Informations étudiant</h5>
+                            
+                            <div class="mb-3">
+                                <label for="numero_etudiant" class="form-label">Numéro étudiant</label>
+                                <input type="text" class="form-control" id="numero_etudiant" name="numero_etudiant">
+                                <div class="invalid-feedback">
+                                    Veuillez entrer un numéro étudiant.
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="specialite_id" class="form-label">Spécialité</label>
+                                    <select class="form-select" id="specialite_id" name="specialite_id">
+                                        <option value="">Sélectionner une spécialité</option>
+                                        {% for specialite in specialites %}
+                                        <option value="{{ specialite.id }}">{{ specialite.nom }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="annee_id" class="form-label">Année</label>
+                                    <select class="form-select" id="annee_id" name="annee_id">
+                                        <option value="">Sélectionner une année</option>
+                                        {% for annee in annees %}
+                                        <option value="{{ annee.id }}">{{ annee.nom }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Champs spécifiques aux responsables -->
+                        <div id="responsable-fields" style="display: none;">
+                            <hr>
+                            <h5>Informations responsable</h5>
+                            
+                            <div class="mb-3">
+                                <label for="titre" class="form-label">Titre</label>
+                                <input type="text" class="form-control" id="titre" name="titre">
+                                <div class="form-text">Titre ou fonction du responsable (optionnel).</div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('admin.utilisateurs') }}" class="btn btn-secondary me-md-2">Annuler</a>
+                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Informations
+                </div>
+                <div class="card-body">
+                    <p>Utilisez ce formulaire pour ajouter un nouvel utilisateur au système.</p>
+                    <p>Les champs requis varient selon le rôle sélectionné.</p>
+                    <div class="alert alert-info">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        <strong>Conseil :</strong> Assurez-vous que l'adresse email est unique et valide.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Form validation
+    (function() {
+        'use strict';
+        
+        var forms = document.querySelectorAll('.needs-validation');
+        
+        Array.prototype.slice.call(forms).forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+    
+    // Show/hide role-specific fields
+    document.getElementById('role').addEventListener('change', function() {
+        var role = this.value;
+        var etudiantFields = document.getElementById('etudiant-fields');
+        var responsableFields = document.getElementById('responsable-fields');
+        var numeroEtudiant = document.getElementById('numero_etudiant');
+        
+        if (role === 'etudiant') {
+            etudiantFields.style.display = 'block';
+            responsableFields.style.display = 'none';
+            numeroEtudiant.required = true;
+        } else if (role === 'responsable') {
+            etudiantFields.style.display = 'none';
+            responsableFields.style.display = 'block';
+            numeroEtudiant.required = false;
+        } else {
+            etudiantFields.style.display = 'none';
+            responsableFields.style.display = 'none';
+            numeroEtudiant.required = false;
+        }
+    });
+    
+    // Trigger change event on page load if role is pre-selected
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('role').dispatchEvent(new Event('change'));
+    });
+</script>
+{% endblock %}

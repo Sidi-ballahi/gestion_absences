@@ -1,0 +1,169 @@
+{% extends "layout.html" %}
+
+{% block title %}Ajouter une Absence{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Ajouter une Absence</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Tableau de Bord</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('absence.index') }}">Gestion des Absences</a></li>
+        <li class="breadcrumb-item active">Ajouter une Absence</li>
+    </ol>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-plus-circle me-1"></i>
+                    Formulaire d'ajout d'absence
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('absence.ajouter') }}" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="etudiant_id" class="form-label">Étudiant</label>
+                            <select class="form-select" id="etudiant_id" name="etudiant_id" required>
+                                <option value="">Sélectionner un étudiant</option>
+                                {% for etudiant in etudiants %}
+                                <option value="{{ etudiant.id }}">{{ etudiant.prenom }} {{ etudiant.nom }} ({{ etudiant.specialite.nom }})</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Veuillez sélectionner un étudiant.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="module_id" class="form-label">Module</label>
+                            <select class="form-select" id="module_id" name="module_id" required>
+                                <option value="">Sélectionner un module</option>
+                                {% for module in modules %}
+                                <option value="{{ module.id }}">{{ module.nom }} ({{ module.code }})</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Veuillez sélectionner un module.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="date" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="date" name="date" required>
+                            <div class="invalid-feedback">
+                                Veuillez sélectionner une date.
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="heure_debut" class="form-label">Heure de début</label>
+                                <input type="time" class="form-control" id="heure_debut" name="heure_debut" required>
+                                <div class="invalid-feedback">
+                                    Veuillez sélectionner une heure de début.
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="heure_fin" class="form-label">Heure de fin</label>
+                                <input type="time" class="form-control" id="heure_fin" name="heure_fin" required>
+                                <div class="invalid-feedback">
+                                    Veuillez sélectionner une heure de fin.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('absence.index') }}" class="btn btn-secondary me-md-2">Annuler</a>
+                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Informations
+                </div>
+                <div class="card-body">
+                    <p>Utilisez ce formulaire pour enregistrer une nouvelle absence pour un étudiant.</p>
+                    <p>Une notification sera automatiquement envoyée à l'étudiant concerné.</p>
+                    <div class="alert alert-info">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        <strong>Astuce :</strong> Vous pouvez filtrer les étudiants par spécialité en utilisant le champ de recherche du menu déroulant.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-cogs me-1"></i>
+                    Options avancées
+                </div>
+                <div class="card-body">
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="notifyStudent" checked>
+                        <label class="form-check-label" for="notifyStudent">Notifier l'étudiant</label>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="addMultiple">
+                        <label class="form-check-label" for="addMultiple">Ajouter plusieurs absences</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Form validation
+    (function() {
+        'use strict';
+        
+        var forms = document.querySelectorAll('.needs-validation');
+        
+        Array.prototype.slice.call(forms).forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+    
+    // Initialize select2 for better dropdown experience
+    $(document).ready(function() {
+        $('#etudiant_id').select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Sélectionner un étudiant',
+            allowClear: true
+        });
+        
+        $('#module_id').select2({
+            theme: 'bootstrap-5',
+            placeholder: 'Sélectionner un module',
+            allowClear: true
+        });
+        
+        // Set default date to today
+        document.getElementById('date').valueAsDate = new Date();
+        
+        // Time validation
+        $('#heure_fin').on('change', function() {
+            var heureDebut = $('#heure_debut').val();
+            var heureFin = $(this).val();
+            
+            if (heureDebut && heureFin && heureDebut >= heureFin) {
+                alert("L'heure de fin doit être postérieure à l'heure de début.");
+                $(this).val('');
+            }
+        });
+    });
+</script>
+{% endblock %}

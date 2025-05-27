@@ -1,0 +1,24 @@
+Justificatif refusé
+
+Bonjour {{ user.etudiant.prenom }} {{ user.etudiant.nom }},
+
+Nous vous informons que votre justificatif d'absence a été REFUSÉ.
+
+Module : {{ module.nom }}
+Date : {{ absence.date.strftime('%d/%m/%Y') }}
+Horaire : {{ absence.heure_debut.strftime('%H:%M') }} - {{ absence.heure_fin.strftime('%H:%M') }}
+
+Motif du refus :
+{{ absence.commentaire }}
+
+Vous pouvez soumettre un nouveau justificatif si nécessaire à l'adresse suivante :
+{{ url_for('etudiant.justifier_absence', absence_id=absence.id, _external=True) }}
+
+Pour rappel, les absences non justifiées peuvent avoir un impact sur votre évaluation.
+
+Cordialement,
+L'équipe pédagogique
+
+---
+Ce message a été envoyé automatiquement, merci de ne pas y répondre.
+© {{ absence.date.year }} Gestion des Absences

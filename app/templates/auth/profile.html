@@ -1,0 +1,189 @@
+{% extends "layout.html" %}
+
+{% block title %}Mon Profil{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Mon Profil</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Tableau de Bord</a></li>
+        <li class="breadcrumb-item active">Mon Profil</li>
+    </ol>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-user me-1"></i>
+                    Informations personnelles
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('auth.profile') }}" class="needs-validation" novalidate>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nom" class="form-label">Nom</label>
+                                <input type="text" class="form-control" id="nom" name="nom" 
+                                       value="{% if current_user.role == 'etudiant' %}{{ etudiant.nom }}{% else %}{{ responsable.nom }}{% endif %}" required>
+                                <div class="invalid-feedback">
+                                    Veuillez entrer votre nom.
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="prenom" class="form-label">Prénom</label>
+                                <input type="text" class="form-control" id="prenom" name="prenom" 
+                                       value="{% if current_user.role == 'etudiant' %}{{ etudiant.prenom }}{% else %}{{ responsable.prenom }}{% endif %}" required>
+                                <div class="invalid-feedback">
+                                    Veuillez entrer votre prénom.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ current_user.email }}" readonly>
+                            <div class="form-text">L'adresse email ne peut pas être modifiée.</div>
+                        </div>
+                        
+                        {% if current_user.role == 'etudiant' %}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="numero_etudiant" class="form-label">Numéro étudiant</label>
+                                <input type="text" class="form-control" id="numero_etudiant" name="numero_etudiant" value="{{ etudiant.numero_etudiant }}" readonly>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="specialite" class="form-label">Spécialité</label>
+                                <input type="text" class="form-control" id="specialite" name="specialite" value="{{ etudiant.specialite.nom if etudiant.specialite else '-' }}" readonly>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="mb-3">
+                            <label for="titre" class="form-label">Titre</label>
+                            <input type="text" class="form-control" id="titre" name="titre" value="{{ responsable.titre or '' }}">
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary">Mettre à jour</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Changer le mot de passe -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-lock me-1"></i>
+                    Changer le mot de passe
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('auth.profile') }}" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="current_password" class="form-label">Mot de passe actuel</label>
+                            <input type="password" class="form-control" id="current_password" name="current_password">
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="new_password" class="form-label">Nouveau mot de passe</label>
+                                <input type="password" class="form-control" id="new_password" name="new_password">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="confirm_password" class="form-label">Confirmer le mot de passe</label>
+                                <input type="password" class="form-control" id="confirm_password" name="confirm_password">
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-warning">Changer le mot de passe</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Informations du compte
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <strong>Rôle :</strong> 
+                            {% if current_user.role == 'etudiant' %}
+                            <span class="badge bg-primary">Étudiant</span>
+                            {% else %}
+                            <span class="badge bg-success">Responsable</span>
+                            {% endif %}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Membre depuis :</strong> {{ current_user.created_at.strftime('%d/%m/%Y') }}
+                        </li>
+                        {% if current_user.role == 'etudiant' %}
+                        <li class="list-group-item">
+                            <strong>Année :</strong> {{ etudiant.annee.nom if etudiant.annee else '-' }}
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            
+            {% if current_user.role == 'etudiant' %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-pie me-1"></i>
+                    Mes statistiques
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h4 class="text-primary">{{ etudiant.absences.count() }}</h4>
+                            <small class="text-muted">Absences totales</small>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-success">{{ etudiant.absences.filter_by(statut='justifiee').count() }}</h4>
+                            <small class="text-muted">Justifiées</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Form validation
+    (function() {
+        'use strict';
+        
+        var forms = document.querySelectorAll('.needs-validation');
+        
+        Array.prototype.slice.call(forms).forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+    
+    // Password confirmation validation
+    document.getElementById('confirm_password').addEventListener('input', function() {
+        var newPassword = document.getElementById('new_password').value;
+        var confirmPassword = this.value;
+        
+        if (newPassword !== confirmPassword) {
+            this.setCustomValidity('Les mots de passe ne correspondent pas');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+</script>
+{% endblock %}

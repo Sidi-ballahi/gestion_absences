@@ -1,0 +1,163 @@
+{% extends "layout.html" %}
+
+{% block title %}Modifier un Utilisateur{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Modifier un Utilisateur</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard.index') }}">Tableau de Bord</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.index') }}">Administration</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.utilisateurs') }}">Utilisateurs</a></li>
+        <li class="breadcrumb-item active">Modifier</li>
+    </ol>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-user-edit me-1"></i>
+                    Formulaire de modification d'utilisateur
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('admin.modifier_utilisateur', user_id=user.id) }}" class="needs-validation" novalidate>
+                        <!-- Informations de base -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nom" class="form-label">Nom</label>
+                                <input type="text" class="form-control" id="nom" name="nom" 
+                                       value="{% if user.role == 'etudiant' %}{{ user.etudiant.nom }}{% else %}{{ user.responsable.nom }}{% endif %}" required>
+                                <div class="invalid-feedback">
+                                    Veuillez entrer un nom.
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="prenom" class="form-label">Prénom</label>
+                                <input type="text" class="form-control" id="prenom" name="prenom" 
+                                       value="{% if user.role == 'etudiant' %}{{ user.etudiant.prenom }}{% else %}{{ user.responsable.prenom }}{% endif %}" required>
+                                <div class="invalid-feedback">
+                                    Veuillez entrer un prénom.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" readonly>
+                            <div class="form-text">L'adresse email ne peut pas être modifiée.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Rôle</label>
+                            <input type="text" class="form-control" id="role" name="role" value="{{ user.role }}" readonly>
+                            <div class="form-text">Le rôle ne peut pas être modifié.</div>
+                        </div>
+                        
+                        {% if user.role == 'etudiant' %}
+                        <!-- Champs spécifiques aux étudiants -->
+                        <hr>
+                        <h5>Informations étudiant</h5>
+                        
+                        <div class="mb-3">
+                            <label for="numero_etudiant" class="form-label">Numéro étudiant</label>
+                            <input type="text" class="form-control" id="numero_etudiant" name="numero_etudiant" value="{{ user.etudiant.numero_etudiant }}" required>
+                            <div class="invalid-feedback">
+                                Veuillez entrer un numéro étudiant.
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="specialite_id" class="form-label">Spécialité</label>
+                                <select class="form-select" id="specialite_id" name="specialite_id">
+                                    <option value="">Sélectionner une spécialité</option>
+                                    {% for specialite in specialites %}
+                                    <option value="{{ specialite.id }}" {% if user.etudiant.specialite_id == specialite.id %}selected{% endif %}>{{ specialite.nom }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="annee_id" class="form-label">Année</label>
+                                <select class="form-select" id="annee_id" name="annee_id">
+                                    <option value="">Sélectionner une année</option>
+                                    {% for annee in annees %}
+                                    <option value="{{ annee.id }}" {% if user.etudiant.annee_id == annee.id %}selected{% endif %}>{{ annee.nom }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        {% else %}
+                        <!-- Champs spécifiques aux responsables -->
+                        <hr>
+                        <h5>Informations responsable</h5>
+                        
+                        <div class="mb-3">
+                            <label for="titre" class="form-label">Titre</label>
+                            <input type="text" class="form-control" id="titre" name="titre" value="{{ user.responsable.titre or '' }}">
+                            <div class="form-text">Titre ou fonction du responsable (optionnel).</div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('admin.utilisateurs') }}" class="btn btn-secondary me-md-2">Annuler</a>
+                            <button type="submit" class="btn btn-primary">Mettre à jour</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Informations
+                </div>
+                <div class="card-body">
+                    <p>Modifiez les informations de l'utilisateur <strong>{{ user.email }}</strong>.</p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <strong>Rôle :</strong> 
+                            {% if user.role == 'etudiant' %}
+                            <span class="badge bg-primary">Étudiant</span>
+                            {% else %}
+                            <span class="badge bg-success">Responsable</span>
+                            {% endif %}
+                        </li>
+                        <li class="list-group-item">
+                            <strong>Créé le :</strong> {{ user.created_at.strftime('%d/%m/%Y') }}
+                        </li>
+                        {% if user.role == 'etudiant' %}
+                        <li class="list-group-item">
+                            <strong>Absences :</strong> {{ user.etudiant.absences.count() }}
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Form validation
+    (function() {
+        'use strict';
+        
+        var forms = document.querySelectorAll('.needs-validation');
+        
+        Array.prototype.slice.call(forms).forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+</script>
+{% endblock %}
